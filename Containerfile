@@ -28,15 +28,17 @@ RUN --mount=type=cache,id=libdnf,target="/var/lib/dnf" \
 
 RUN --mount=type=cache,id=libdnf,target="/var/lib/dnf" \
     --mount=type=cache,id=cachednf,target="/var/cache/dnf" \
-  dnf -y --allowerasing install $(jq -r '.add | flatten | join(" ")' "/usr/local/share/bootc/packages.json") \
+  dnf -y --allowerasing --nodocs install $(jq -r '.add | flatten | join(" ")' "/usr/local/share/bootc/packages.json") \
   && dnf -y remove $(jq -r '.remove | flatten | join(" ")' "/usr/local/share/bootc/packages.json") \
+  && rm /usr/bin/wezterm-gui \
   && dnf -y autoremove \
   && dnf clean all
-
 
 # config
 COPY --chmod=0755 ./scripts/* /usr/local/bin/
 COPY --chmod=0644 ./system/etc_skel_bashrcd /etc/skel/.bashrc.d/bootc
+COPY --chmod=0644 ./system/kargs_00-console.toml /usr/lib/bootc/kargs.d/00-console.toml
+COPY --chmod=0640 --chown="${USERNAME}:${USERNAME}" ./home/* "/home/${USERNAME}/"
 
 RUN mkdir -p /home/${USERNAME}/.ssh
 COPY --chown="${USERNAME}:${USERNAME}" --chmod=0640 ./authorized_keys /home/${USERNAME}/.ssh/authorized_keys

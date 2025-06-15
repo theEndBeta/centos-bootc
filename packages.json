@@ -28,13 +28,22 @@
       "wget",
       "git",
       "firewalld",
-      "tuned"
+      "tuned",
+      "just"
     ]
   },
   "remove": {
     "virtualization": [
       "libvirt*",
       "qemu*"
+    ],
+    "redhat": [
+      "rhc",
+      "subscription-manager"
+    ],
+    "unneeded": [
+      "yggdrasil",
+      "toolbox"
     ],
     "unusable": [
       "PackageKit",
