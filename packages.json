@@ -1,5 +1,9 @@
 {
   "add": {
+    "hyperscale": [
+      "systemd",
+      "selinux-policy"
+    ],
     "cockpit": [
       "cockpit",
       "cockpit-podman",
@@ -23,13 +27,15 @@
       "ripgrep"
     ],
     "util": [
+      "cloud-init",
       "bash-completion",
       "wezterm",
       "wget",
       "git",
       "firewalld",
       "tuned",
-      "just"
+      "just",
+      "ncurses"
     ]
   },
   "remove": {

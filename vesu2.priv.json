@@ -1,0 +1,16 @@
+{
+  "privileged": {
+    "hashedPassword": [
+      "$y$j9T$rgIIgXU.iiGCNeGeo27Va1$.UbQgNafnJ0.OX7MIYunDIKU2T5dySSoLuC8I9kxke6"
+    ],
+    "sshAuthorizedKeys": [
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKoabiCtKYWtp5hr2CpFN2RnIZKrpx1rt5f42Dq8Ykay greatpigeon@gp-Z370"
+    ]
+  },
+  "hashedPassword": [
+    "$y$j9T$rgIIgXU.iiGCNeGeo27Va1$.UbQgNafnJ0.OX7MIYunDIKU2T5dySSoLuC8I9kxke6"
+  ],
+  "sshAuthorizedKeys": [
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKoabiCtKYWtp5hr2CpFN2RnIZKrpx1rt5f42Dq8Ykay greatpigeon@gp-Z370"
+  ]
+}

@@ -1,0 +1,15 @@
+[private]
+default:
+  just --list
+
+# Check if an upgrade is available
+check:
+  bootc upgrade --check
+
+# Upgrade and reboot
+upgrade:
+  bootc upgrade --apply
+
+# Change password
+change-pw:
+  passwd

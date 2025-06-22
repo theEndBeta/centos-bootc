@@ -11,10 +11,12 @@ hostnamectl hostname "$HOST_NAME"
 # Setup USERS
 ###############################################
 
-USERNAME=${USERNAME:-"vesu"}
+USERNAME=${USERNAME:-"vesu2"}
 
-usermod -a -G podman "${USERNAME}"
-loginctl enable-linger "${USERNAME}"
+homectl firstboot
+
+# usermod -a -G podman "${USERNAME}"
+# loginctl enable-linger "${USERNAME}"
 
 ###############################################
 # Setup FIREWALL
