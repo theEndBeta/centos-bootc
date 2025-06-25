@@ -1,0 +1,14 @@
+{
+  "autoLogin": true,
+  "disposition": "regular",
+  "enforcePasswordPolicy": false,
+  "homeDirectory": "/var/home/vesu",
+  "shell": "/usr/bin/fish",
+  "uid": 1003,
+  "gid": 1003,
+  "userName": "vesu",
+  "memberOf": [
+    "wheel",
+    "podman"
+  ]
+}

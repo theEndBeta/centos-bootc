@@ -1,0 +1,28 @@
+#!/usr/bin/bash
+
+###############################################
+# Setup HOST
+###############################################
+
+# HOST_NAME=${HOST_NAME:-"bootc"}
+# hostnamectl hostname "$HOST_NAME"
+
+###############################################
+# Setup USERS
+###############################################
+
+mkhomedir_helper vesu
+mkhomedir_helper admin
+
+loginctl enable-linger "vesu"
+
+###############################################
+# Setup FIREWALL
+###############################################
+
+# if [ "$(firewall-cmd --get-default-zone)" != "public" ]; then
+#   firewall-cmd --set-default-zone=public
+# fi
+# firewall-cmd --reload
+
+# vim: set ft=bash:

@@ -1,0 +1,11 @@
+#!/usr/bin/bash
+
+users=("vesu" "podman")
+
+range=65536
+base=1000001
+
+for idx in "${!users[@]}"; do
+  echo "${users[$idx]}:$((base + (range * idx))):$range" >>/etc/subuid
+  echo "${users[$idx]}:$((base + (range * idx))):$range" >>/etc/subgid
+done

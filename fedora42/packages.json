@@ -1,0 +1,56 @@
+{
+  "add": {
+    "cockpit": [
+      "cockpit",
+      "cockpit-podman",
+      "cockpit-selinux",
+      "cockpit-storaged"
+    ],
+    "tailscale": [
+      "tailscale"
+    ],
+    "Troubleshooting": [
+      "lshw",
+      "btop",
+      "htop",
+      "ncdu",
+      "nmap",
+      "bind-utils"
+    ],
+    "other": [
+      "neovim",
+      "fd-find",
+      "ripgrep",
+      "xdg-user-dirs",
+      "cargo"
+    ],
+    "util": [
+      "fish",
+      "cloud-init",
+      "bash-completion",
+      "wezterm",
+      "wget",
+      "git",
+      "firewalld",
+      "tuned",
+      "just"
+    ]
+  },
+  "remove": {
+    "virtualization": [
+      "libvirt*",
+      "qemu*"
+    ],
+    "redhat": [],
+    "unneeded": [
+      "yggdrasil",
+      "toolbox"
+    ],
+    "unusable": [
+      "PackageKit",
+      "cockpit-packagekit",
+      "wl-clipboard",
+      "xsel"
+    ]
+  }
+}
