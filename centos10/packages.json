@@ -35,7 +35,8 @@
       "firewalld",
       "tuned",
       "just",
-      "ncurses"
+      "fish",
+      "cargo"
     ]
   },
   "remove": {
