@@ -8,7 +8,6 @@
   "gid": 1003,
   "userName": "vesu",
   "memberOf": [
-    "wheel",
-    "podman"
+    "wheel"
   ]
 }

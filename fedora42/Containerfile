@@ -31,37 +31,22 @@ RUN tic -x -o /usr/share/terminfo /tmp/wezterm.terminfo
 COPY --chmod=0755 ./scripts/* /usr/local/bin/
 COPY --chmod=0644 ./system/etc_skel_bashrcd /etc/skel/.bashrc.d/bootc
 COPY --chmod=0644 ./system/kargs_00-console.toml /usr/lib/bootc/kargs.d/00-console.toml
-COPY --chmod=0644 ./system/sshd_config_99-systemd-homed.conf /etc/ssh/sshd_config.d/99-systemd-homed.conf
+COPY --chmod=0644 ./system/sshd_config_99-systemd-userdbd.conf /etc/ssh/sshd_config.d/99-systemd-userdbd.conf
 
 # RUN /usr/local/bin/user-conf
 
-# Users
-# COPY --chmod=0644 ./vesu.json /usr/lib/userdb/vesu.user
-# COPY --chmod=0644 ./vesu.json /usr/lib/credstore/home.create.vesu
-
-# RUN useradd vesu \
-#   -u 1000 \
-#   -K SUB_GID_MIN=1000001 \
-#   -K SUB_UID_MIN=1000001 \
-#   -G wheel,podman \
-#   -s /usr/bin/fish \
-#   -p '$y$j9T$rgIIgXU.iiGCNeGeo27Va1$.UbQgNafnJ0.OX7MIYunDIKU2T5dySSoLuC8I9kxke6'
-
-# RUN mkdir -p /var/containers/systemd/users \
-#   && ln -s /var/containers /etc \
-#   && chmod 0755 /var/containers/systemd
-
+COPY --chmod=0644 ./vesu.group.json /usr/lib/userdb/vesu.group
 COPY --chmod=0644 ./vesu.user.json /usr/lib/userdb/vesu.user
 COPY --chmod=0600 ./vesu.user-privileged.json /usr/lib/userdb/vesu.user-privileged
 RUN ln -s /usr/lib/userdb/vesu.user /usr/lib/userdb/1003.user \
-    && ln -s /usr/lib/userdb/vesu.user-privileged /usr/lib/userdb/1003.user-privileged
+    && ln -s /usr/lib/userdb/vesu.group /usr/lib/userdb/1003.group \
+    && ln -s /usr/lib/userdb/vesu.user-privileged /usr/lib/userdb/1003.user-privileged \
+    && echo "none" > /usr/lib/userdb/vesu:wheel.membership \
+    && echo "none" >  /usr/lib/userdb/vesu:podman.membership
 
 # SYSTEMD
 COPY --chmod=0644 ./systemd/firstboot-setup.service /usr/lib/systemd/system/firstboot-setup.service
 
-# RUN authselect enable-feature with-systemd-homed
-
-# RUN systemctl enable systemd-homed.service cockpit.socket firstboot-setup.service systemd-homed-firstboot.service
 RUN systemctl enable cockpit.socket firstboot-setup.service
 RUN systemctl enable podman.service podman-auto-update.service podman-clean-transient.service podman.socket
 

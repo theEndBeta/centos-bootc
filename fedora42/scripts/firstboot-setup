@@ -12,7 +12,6 @@
 ###############################################
 
 mkhomedir_helper vesu
-mkhomedir_helper admin
 
 loginctl enable-linger "vesu"
 
