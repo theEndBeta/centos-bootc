@@ -21,8 +21,7 @@
       "neovim",
       "fd-find",
       "ripgrep",
-      "xdg-user-dirs",
-      "cargo"
+      "xdg-user-dirs"
     ],
     "util": [
       "fish",
