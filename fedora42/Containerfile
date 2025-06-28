@@ -24,16 +24,24 @@ RUN --mount=type=cache,id=libdnf,target="/var/lib/dnf" \
   && dnf -y autoremove \
   && dnf clean all
 
+# Install eza (not in repos)
+ARG eza_version="v0.21.6"
+RUN curl -sSL \
+  "https://github.com/eza-community/eza/releases/download/${eza_version}/eza_x86_64-unknown-linux-gnu.tar.gz" \
+  | tar -xz -C /usr/local/bin \
+  && chmod +x /usr/local/bin/eza
+
+# Add wezterm terminfo
 COPY ./wezterm.terminfo /tmp/wezterm.terminfo
 RUN tic -x -o /usr/share/terminfo /tmp/wezterm.terminfo
 
 # config
 COPY --chmod=0755 ./scripts/* /usr/local/bin/
-COPY --chmod=0644 ./system/etc_skel_bashrcd /etc/skel/.bashrc.d/bootc
+COPY --chmod=0644 ./system/skel/ /etc/skel/
 COPY --chmod=0644 ./system/kargs_00-console.toml /usr/lib/bootc/kargs.d/00-console.toml
 COPY --chmod=0644 ./system/sshd_config_99-systemd-userdbd.conf /etc/ssh/sshd_config.d/99-systemd-userdbd.conf
 
-# RUN /usr/local/bin/user-conf
+RUN /usr/local/bin/user-conf
 
 COPY --chmod=0644 ./vesu.group.json /usr/lib/userdb/vesu.group
 COPY --chmod=0644 ./vesu.user.json /usr/lib/userdb/vesu.user
@@ -41,14 +49,12 @@ COPY --chmod=0600 ./vesu.user-privileged.json /usr/lib/userdb/vesu.user-privileg
 RUN ln -s /usr/lib/userdb/vesu.user /usr/lib/userdb/1003.user \
     && ln -s /usr/lib/userdb/vesu.group /usr/lib/userdb/1003.group \
     && ln -s /usr/lib/userdb/vesu.user-privileged /usr/lib/userdb/1003.user-privileged \
-    && echo "none" > /usr/lib/userdb/vesu:wheel.membership \
-    && echo "none" >  /usr/lib/userdb/vesu:podman.membership
+    && echo "{}" > /usr/lib/userdb/vesu:wheel.membership \
+    && echo "{}" >  /usr/lib/userdb/vesu:podman.membership
 
-# SYSTEMD
-COPY --chmod=0644 ./systemd/firstboot-setup.service /usr/lib/systemd/system/firstboot-setup.service
-
-RUN systemctl enable cockpit.socket firstboot-setup.service
-RUN systemctl enable podman.service podman-auto-update.service podman-clean-transient.service podman.socket
+# systemd
+RUN systemctl enable cockpit.socket tailscaled.service \
+  podman.service podman-auto-update.service podman-clean-transient.service podman.socket 
 
 RUN rm /var/{log,cache,lib}/* -rf
 

@@ -3,5 +3,6 @@ alias la='ls --color=auto --time-style=long-iso -hla'
 alias laz='ls --color=auto --time-style=long-iso -hlaZ'
 alias llz='ls --color=auto --time-style=long-iso -hlZ'
 alias ll='ls --color=auto --time-style=long-iso -hl'
+alias vim=nvim
 
 PATH="$HOME/.cargo/bin/:$PATH"
