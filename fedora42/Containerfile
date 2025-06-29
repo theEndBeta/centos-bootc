@@ -1,56 +1,43 @@
 FROM quay.io/fedora/fedora-bootc:42
 
-RUN echo '[etc]' >> /usr/lib/ostree/prepare-root.conf \
-    && echo 'transient = true' >> /usr/lib/ostree/prepare-root.conf
-
 COPY ./system/wheel-passwordless-sudo /etc/sudoers.d/wheel-passwordless-sudo
 COPY --chmod=0644 ./sysusers.conf /usr/lib/sysusers.d/podman.conf
 
 # Packages
-COPY --chmod=0644 ./packages.json /usr/local/share/bootc/packages.json
-RUN jq -r .packages[] /usr/share/rpm-ostree/treefile.json > /usr/local/share/bootc/packages-centos-bootc \
-    && jq -r '.add | flatten | join(" ")' /usr/local/share/bootc/packages.json
-RUN --mount=type=cache,id=libdnf,target="/var/lib/dnf" \
-    --mount=type=cache,id=cachednf,target="/var/cache/dnf" \
-  dnf -y install dnf5-plugins \
-  && dnf -y copr enable wezfurlong/wezterm-nightly \
-  && dnf -y config-manager addrepo --from-repofile=https://pkgs.tailscale.com/stable/fedora/tailscale.repo
+COPY --chmod=0770 ./pkgs/repos.sh /usr/local/share/bootc/repos.sh
 
 RUN --mount=type=cache,id=libdnf,target="/var/lib/dnf" \
     --mount=type=cache,id=cachednf,target="/var/cache/dnf" \
-  dnf -y --no-docs --refresh install --allowerasing $(jq -r '.add | flatten | join(" ")' "/usr/local/share/bootc/packages.json") \
-  && dnf -y remove $(jq -r '.remove | flatten | join(" ")' "/usr/local/share/bootc/packages.json") \
-  && rm /usr/bin/wezterm-gui \
-  && dnf -y autoremove \
-  && dnf clean all
+    /usr/bin/bash /usr/local/share/bootc/repos.sh
 
-# Install eza (not in repos)
+COPY --chmod=0644 ./pkgs/packages.json /usr/local/share/bootc/packages.json
+COPY --chmod=0770 ./pkgs/installs.sh /usr/local/share/bootc/installs.sh
 ARG eza_version="v0.21.6"
-RUN curl -sSL \
-  "https://github.com/eza-community/eza/releases/download/${eza_version}/eza_x86_64-unknown-linux-gnu.tar.gz" \
-  | tar -xz -C /usr/local/bin \
-  && chmod +x /usr/local/bin/eza
+ENV EZA_VERSION=${eza_version}
+RUN --mount=type=cache,id=libdnf,target="/var/lib/dnf" \
+    --mount=type=cache,id=cachednf,target="/var/cache/dnf" \
+    /usr/bin/bash /usr/local/share/bootc/installs.sh
+
 
 # Add wezterm terminfo
 COPY ./wezterm.terminfo /tmp/wezterm.terminfo
 RUN tic -x -o /usr/share/terminfo /tmp/wezterm.terminfo
 
 # config
-COPY --chmod=0755 ./scripts/* /usr/local/bin/
 COPY --chmod=0644 ./system/skel/ /etc/skel/
 COPY --chmod=0644 ./system/kargs_00-console.toml /usr/lib/bootc/kargs.d/00-console.toml
 COPY --chmod=0644 ./system/sshd_config_99-systemd-userdbd.conf /etc/ssh/sshd_config.d/99-systemd-userdbd.conf
 
-RUN /usr/local/bin/user-conf
+# Set up user namespace sub{u,g}id
+COPY --chmod=0755 ./scripts/user-conf /tmp/user-conf
+RUN /tmp/user-conf
 
-COPY --chmod=0644 ./vesu.group.json /usr/lib/userdb/vesu.group
-COPY --chmod=0644 ./vesu.user.json /usr/lib/userdb/vesu.user
-COPY --chmod=0600 ./vesu.user-privileged.json /usr/lib/userdb/vesu.user-privileged
-RUN ln -s /usr/lib/userdb/vesu.user /usr/lib/userdb/1003.user \
+COPY ./userdb/ /usr/lib/userdb/
+RUN chmod 0644 /usr/lib/userdb/vesu.user /usr/lib/userdb/vesu.group \
+    && chmod 0600 /usr/lib/userdb/vesu.user-privileged \
+    && ln -s /usr/lib/userdb/vesu.user /usr/lib/userdb/1003.user \
     && ln -s /usr/lib/userdb/vesu.group /usr/lib/userdb/1003.group \
-    && ln -s /usr/lib/userdb/vesu.user-privileged /usr/lib/userdb/1003.user-privileged \
-    && echo "{}" > /usr/lib/userdb/vesu:wheel.membership \
-    && echo "{}" >  /usr/lib/userdb/vesu:podman.membership
+    && ln -s /usr/lib/userdb/vesu.user-privileged /usr/lib/userdb/1003.user-privileged
 
 # systemd
 RUN systemctl enable cockpit.socket tailscaled.service \

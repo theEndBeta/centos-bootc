@@ -1,7 +1,0 @@
-{
-  "privileged": {
-    "sshAuthorizedKeys": [
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKoabiCtKYWtp5hr2CpFN2RnIZKrpx1rt5f42Dq8Ykay greatpigeon@gp-Z370"
-    ]
-  }
-}

@@ -40,7 +40,8 @@ vm-launch variant version name:
     --import \
     --disk ./image/{{ name }}.{{ version }}.raw,format=raw \
     --autoconsole text \
-    --os-variant={{ variant }}
+    --os-variant={{ variant }} \
+    --cloud-init user-data="cloud-init/user-data.yml"
 
 [private]
 [group("vm")]
