@@ -41,8 +41,8 @@ RUN chmod 0644 /usr/lib/userdb/vesu.user /usr/lib/userdb/vesu.group \
     && ln -s /usr/lib/userdb/vesu.user-privileged /usr/lib/userdb/1003.user-privileged
 
 # systemd
-RUN systemctl enable cockpit.socket tailscaled.service \
-  podman.service podman-auto-update.service podman-clean-transient.service podman.socket 
+RUN systemctl enable cockpit.socket tailscaled.service bootc-fetch-apply-updates.timer \
+  podman.service podman-clean-transient.service podman.socket podman-auto-update.timer
 
 RUN rm /var/{log,cache,lib}/* -rf
 
