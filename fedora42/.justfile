@@ -3,8 +3,10 @@ mod bc '../bootc.justfile'
 _name := "f42"
 _repo := "quay.io/theendbeta"
 _repo_local := "localhost:5000"
-_tag := "fedora42-bootc"
-_version := `date +'%Y%m%d%H%M'`
+_tag := "fedora-bootc"
+_base_version := "42"
+_version := _base_version + "-" + `date +'%Y%m%d%H%M'`
+_v_latest := _base_version + "-latest"
 
 [private]
 default:
@@ -12,16 +14,20 @@ default:
 
 [group("container")]
 pull-base:
-  podman pull quay.io/fedora/fedora-bootc:42
+  podman pull quay.io/fedora/fedora-bootc:{{ _base_version }}
 
 [group("container")]
-build tag=_tag version=_version:
-  just bc::_build {{ _repo }} {{ tag }} {{ version }}
+build version=_version repo=_repo tag=_tag:
+  podman build . --pull=newer -f Containerfile \
+    -t "{{ repo }}/{{ tag }}:{{ version }}" \
+    -t "{{ repo }}/{{ tag }}:{{ _v_latest }}"
 
 # Build image tags 
 [group("container")]
 build-local tag=_tag version=_version:
-  just bc::_build {{ _repo_local }} {{ tag }} {{ version }}
+  podman build . --pull=newer -f Containerfile \
+    -t "{{ _repo_local }}/{{ tag }}:{{ version }}" \
+    -t "{{ _repo_local }}/{{ tag }}:{{ _v_latest }}"
 
 # Push <tag> to local <repo>
 [group("container")]
@@ -38,6 +44,13 @@ push-local version repo=_repo_local tag=_tag:
 build-push-local version repo=_repo_local tag=_tag:
   just build-local
   just push-local "{{ version }}"
+
+[group("container")]
+[group("cloud")]
+build-push-cloud version=_version repo=_repo tag=_tag:
+  just build {{ version }} {{ repo }} {{ tag }}
+  just push {{ version }} {{ repo }} {{ tag }}
+  just push {{ _v_latest }} {{ repo }} {{ tag }}
 
 # Build the base image, push to local repo, and generate the disk image
 [group("container")]
@@ -88,25 +101,48 @@ _gen-image repo tag version size:
     "/target/image/{{ _name }}.{{ version }}.raw"
 
 [group("disk-image")]
-gen-image version tag=_tag size="5G":
+gen-cloud-image repo=_repo tag=_tag size="4G":
+  just build
+  just push "{{ _v_latest }}"
+  just push "{{ _version }}"
+
+  mkdir -p ./image
+  truncate -s {{ size }} "image/{{ _name }}.{{ _v_latest }}.img"
+  sudo podman run --rm \
+    --privileged \
+    --pid=host \
+    --pull=newer \
+    --security-opt label=type:unconfined_t \
+    -v /dev:/dev \
+    -v /var/lib/containers:/var/lib/containers \
+    -v ./:/target \
+    "{{ _repo }}/{{ tag }}:{{ _v_latest }}" bootc install to-disk \
+    --generic-image \
+    --via-loopback \
+    --filesystem=btrfs \
+    "/target/image/{{ _name }}.{{ _v_latest }}.img"
+  gzip "image/{{ _name }}.{{ _v_latest }}.img"
+
+[group("disk-image")]
+gen-image version tag=_tag size="4G":
   just _gen-image {{ _repo }} {{ tag }} {{ version }} {{ size }}
 
 [group("disk-image")]
-gen-image-local version tag=_tag size="5G":
+gen-image-local version tag=_tag size="4G":
   just _gen-image {{ _repo_local }} {{ tag }} {{ version }} {{ size }}
 
 [group("vm")]
-vm-launch version="latest" name=_name:
+vm-launch version="{{ _v_latest }}" name=_name:
   just bc::vm-launch "fedora-unknown" {{ version }} {{ name }}
 
 [group("vm")]
-vm-start version="latest" name=_name:
+vm-start version="{{ _v_latest }}" name=_name:
   just bc::vm-start {{ version }} {{ name }}
 
 [group("vm")]
-vm-stop version="latest" name=_name:
+vm-stop version="{{ _v_latest }}" name=_name:
   just bc::vm-stop {{ version }} {{ name }}
 
 [group("vm")]
-vm-delete version="latest" name=_name:
+vm-delete version="{{ _v_latest }}" name=_name:
   just bc::vm-delete {{ version }} {{ name }}
