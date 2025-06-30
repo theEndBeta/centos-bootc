@@ -25,6 +25,7 @@ RUN tic -x -o /usr/share/terminfo /tmp/wezterm.terminfo
 
 # config
 COPY --chmod=0644 ./system/skel/ /etc/skel/
+COPY --chmod=0644 ./system/etc-firewalld/ /etc/firewalld/
 COPY --chmod=0644 ./system/kargs_00-console.toml /usr/lib/bootc/kargs.d/00-console.toml
 COPY --chmod=0644 ./system/sshd_config_99-systemd-userdbd.conf /etc/ssh/sshd_config.d/99-systemd-userdbd.conf
 
