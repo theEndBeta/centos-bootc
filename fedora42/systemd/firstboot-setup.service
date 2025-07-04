@@ -1,12 +1,16 @@
 [Unit]
-Description=Setup USERS and /VAR at boot
+Description=Setup users at first boot
 After=multi-user.target
+ConditionPathExists=!/var/home/vesu
+ConditionPathExists=!/var/home/podman
+ConditionPathExists=!/var/lib/systemd/linger/podman
 
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStart=/usr/local/bin/firstboot-setup
-ImportCredential=home.create.*
+ExecStart=/usr/sbin/mkhomedir_helper vesu
+ExecStart=/usr/sbin/mkhomedir_helper podman
+ExecStart=/usr/sbin/loginctl enable-linger "podman"
 
 [Install]
 WantedBy=multi-user.target

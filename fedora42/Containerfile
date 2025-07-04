@@ -25,23 +25,24 @@ RUN tic -x -o /usr/share/terminfo /tmp/wezterm.terminfo
 
 # config
 COPY --chmod=0644 ./system/skel/ /etc/skel/
-COPY --chmod=0644 ./system/etc-firewalld/ /etc/firewalld/
 COPY --chmod=0644 ./system/kargs_00-console.toml /usr/lib/bootc/kargs.d/00-console.toml
 COPY --chmod=0644 ./system/sshd_config_99-systemd-userdbd.conf /etc/ssh/sshd_config.d/99-systemd-userdbd.conf
 
+# Firewall zone and service
+COPY --chmod=0644 ./system/usr-lib-firewalld/zones/BootcServer.xml /usr/lib/firewalld/zones/BootcServer.xml
+COPY --chmod=0644 ./systemd/ /usr/lib/systemd/system/
+
 # Set up user namespace sub{u,g}id
 COPY --chmod=0755 ./scripts/user-conf /tmp/user-conf
-RUN /tmp/user-conf
+RUN /tmp/user-conf && rm /tmp/user-conf
 
 COPY ./userdb/ /usr/lib/userdb/
 RUN chmod 0644 /usr/lib/userdb/vesu.user /usr/lib/userdb/vesu.group \
-    && chmod 0600 /usr/lib/userdb/vesu.user-privileged \
-    && ln -s /usr/lib/userdb/vesu.user /usr/lib/userdb/1003.user \
-    && ln -s /usr/lib/userdb/vesu.group /usr/lib/userdb/1003.group \
-    && ln -s /usr/lib/userdb/vesu.user-privileged /usr/lib/userdb/1003.user-privileged
+    && chmod 0600 /usr/lib/userdb/vesu.user-privileged
 
 # systemd
 RUN systemctl enable cockpit.socket tailscaled.service bootc-fetch-apply-updates.timer \
+  firewalld-set-zone.service firstboot-setup.service \
   podman.service podman-clean-transient.service podman.socket podman-auto-update.timer
 
 RUN rm /var/{log,cache,lib}/* -rf

@@ -1,0 +1,12 @@
+[Unit]
+Description=Set firewall zone to BootcServer
+After=firewalld.service
+Requires=firewalld.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=firewall-cmd --set-default-zone BootcServer
+
+[Install]
+WantedBy=multi-user.target

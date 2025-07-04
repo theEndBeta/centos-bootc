@@ -24,10 +24,9 @@ build version=_version repo=_repo tag=_tag:
 
 # Build image tags 
 [group("container")]
-build-local tag=_tag version=_version:
+build-local  version=_v_latest tag=_tag:
   podman build . --pull=newer -f Containerfile \
-    -t "{{ _repo_local }}/{{ tag }}:{{ version }}" \
-    -t "{{ _repo_local }}/{{ tag }}:{{ _v_latest }}"
+    -t "{{ _repo_local }}/{{ tag }}:{{ version }}"
 
 # Push <tag> to local <repo>
 [group("container")]
@@ -36,13 +35,13 @@ push version repo=_repo tag=_tag:
 
 # Push <tag> to local <repo>
 [group("container")]
-push-local version repo=_repo_local tag=_tag:
+push-local version=_v_latest repo=_repo_local tag=_tag:
   just bc::_push {{ repo }} {{ tag }} {{ version }}
 
 # Build the base image and push to local repo
 [group("container")]
-build-push-local version repo=_repo_local tag=_tag:
-  just build-local
+build-push-local version=_v_latest repo=_repo_local tag=_tag:
+  just build-local "{{ version }}"
   just push-local "{{ version }}"
 
 [group("container")]
@@ -55,8 +54,8 @@ build-push-cloud version=_version repo=_repo tag=_tag:
 # Build the base image, push to local repo, and generate the disk image
 [group("container")]
 [group("disk-image")]
-build-push-gen-local version repo=_repo_local tag=_tag:
-  just build-local
+build-push-gen-local version=_v_latest repo=_repo_local tag=_tag:
+  just build-local "{{ version }}"
   just push-local "{{ version }}"
   just gen-image-local "{{ version }}"
 
@@ -73,8 +72,8 @@ exec name=_name:
   podman exec -it {{ name }} /bin/bash
 
 [group("container")]
-run-it name=_name tag=_tag repo=_repo:
-  just bc::_run-it {{ name }} {{ tag }} {{ repo }}
+run-it version=_v_latest name=_name tag=_tag repo=_repo:
+  just bc::_run-it {{ version }} {{ name }} {{ tag }} {{ repo }}
 
 [group("container")]
 run-it-local name=_name tag=_tag repo=_repo_local:
@@ -128,21 +127,21 @@ gen-image version tag=_tag size="4G":
   just _gen-image {{ _repo }} {{ tag }} {{ version }} {{ size }}
 
 [group("disk-image")]
-gen-image-local version tag=_tag size="4G":
+gen-image-local version=_v_latest tag=_tag size="4G":
   just _gen-image {{ _repo_local }} {{ tag }} {{ version }} {{ size }}
 
 [group("vm")]
-vm-launch version="{{ _v_latest }}" name=_name:
+vm-launch version=_v_latest name=_name:
   just bc::vm-launch "fedora-unknown" {{ version }} {{ name }}
 
 [group("vm")]
-vm-start version="{{ _v_latest }}" name=_name:
+vm-start version=_v_latest name=_name:
   just bc::vm-start {{ version }} {{ name }}
 
 [group("vm")]
-vm-stop version="{{ _v_latest }}" name=_name:
+vm-stop version=_v_latest name=_name:
   just bc::vm-stop {{ version }} {{ name }}
 
 [group("vm")]
-vm-delete version="{{ _v_latest }}" name=_name:
+vm-delete version=_v_latest name=_name:
   just bc::vm-delete {{ version }} {{ name }}

@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-users=("vesu" "podman")
+users=("podman" "vesu")
 
 range=65536
 base=1000001
