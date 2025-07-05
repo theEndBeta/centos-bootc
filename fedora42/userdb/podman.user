@@ -1,0 +1,9 @@
+{
+  "disposition": "system",
+  "enforcePasswordPolicy": false,
+  "homeDirectory": "/var/home/podman",
+  "shell": "/usr/bin/fish",
+  "uid": 2001,
+  "gid": 2001,
+  "userName": "podman"
+}

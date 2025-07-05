@@ -1,7 +1,6 @@
 FROM quay.io/fedora/fedora-bootc:42
 
 COPY ./system/wheel-passwordless-sudo /etc/sudoers.d/wheel-passwordless-sudo
-COPY --chmod=0644 ./sysusers.conf /usr/lib/sysusers.d/podman.conf
 
 # Packages
 COPY --chmod=0770 ./pkgs/repos.sh /usr/local/share/bootc/repos.sh
