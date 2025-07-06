@@ -1,7 +1,5 @@
 FROM quay.io/fedora/fedora-bootc:42
 
-COPY ./system/wheel-passwordless-sudo /etc/sudoers.d/wheel-passwordless-sudo
-
 # Packages
 COPY --chmod=0770 ./pkgs/repos.sh /usr/local/share/bootc/repos.sh
 
@@ -23,6 +21,8 @@ COPY ./wezterm.terminfo /tmp/wezterm.terminfo
 RUN tic -x -o /usr/share/terminfo /tmp/wezterm.terminfo
 
 # config
+COPY --chmod=0400 ./system/wheel-passwordless-sudo /etc/sudoers.d/wheel-passwordless-sudo
+COPY --chmod=0400 ./system/etc-doas.conf /etc/doas.conf
 COPY --chmod=0644 ./system/skel/ /etc/skel/
 COPY --chmod=0644 ./system/kargs_00-console.toml /usr/lib/bootc/kargs.d/00-console.toml
 COPY --chmod=0644 ./system/sshd_config_99-systemd-userdbd.conf /etc/ssh/sshd_config.d/99-systemd-userdbd.conf
@@ -35,9 +35,11 @@ COPY --chmod=0644 ./systemd/ /usr/lib/systemd/system/
 COPY --chmod=0755 ./scripts/user-conf /tmp/user-conf
 RUN /tmp/user-conf && rm /tmp/user-conf
 
-COPY ./userdb/ /usr/lib/userdb/
-RUN chmod 0644 /usr/lib/userdb/vesu.user /usr/lib/userdb/vesu.group \
-    && chmod 0600 /usr/lib/userdb/vesu.user-privileged
+ARG userdb_dir=/etc/userdb
+RUN mkdir -p ${userdb_dir} && restorecon -rv /run/userdb
+COPY ./userdb/ ${userdb_dir}/
+RUN chmod 0644 ${userdb_dir}/vesu.user ${userdb_dir}/vesu.group \
+    && chmod 0600 ${userdb_dir}/vesu.user-privileged
 
 # systemd
 RUN systemctl enable cockpit.socket tailscaled.service bootc-fetch-apply-updates.timer \

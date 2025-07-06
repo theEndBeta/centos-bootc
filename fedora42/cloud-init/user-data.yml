@@ -2,13 +2,30 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/canonical/cloud-init/main/cloudinit/config/schemas/versions.schema.cloud-config.json
 runcmd:
   - hostnamectl hostname {{ hostname }}
-  - mkhomedir_helper {{ user }}
-  - loginctl enable-linger {{ user }}
-  - [
-      "tailscale",
-      "up",
-      "--accept-risk=all",
-      "--json",
-      "--ssh",
-      "--auth-key={{ TS_AUTH_KEY }}",
-    ]
+  # - [
+  #     "tailscale",
+  #     "up",
+  #     "--accept-risk=all",
+  #     "--json",
+  #     "--ssh",
+  #     "--auth-key={{ TS_AUTH_KEY }}",
+  #   ]
+write_files:
+  - path: /etc/userdb/vesu.user-privileged
+    content: |
+      {
+        "privileged": {
+          "sshAuthorizedKeys": [
+            "sk-ssh-ed25519@openssh.com AAAAGnNrLXNzaC1lZDI1NTE5QG9wZW5zc2guY29tAAAAIJK6ko9hE8IV2s9IHvbNI+/JhIWSZ61JgnlR+xyYar+UAAAACXNzaDpnaXQtYQ== greatpigeon@etna",
+            "sk-ssh-ed25519@openssh.com AAAAGnNrLXNzaC1lZDI1NTE5QG9wZW5zc2guY29tAAAAIJpN/6pfDNGIKHNqbsc4/hZH01iFqBuQWx1NG0SVPPqZAAAACXNzaDpnaXQtYQ== c@greatpigeon@etna"
+          ],
+          "hashedPassword": [
+            "{{ mkdpasswd 'password' }}"
+          ]
+        }
+      }
+    owner: root:root
+    permissions: "0o600"
+    encoding: text/plain
+    append: false
+    defer: false
