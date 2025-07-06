@@ -17,6 +17,10 @@
       "nmap",
       "bind-utils"
     ],
+    "security": [
+      "doas",
+      "sudo-rs"
+    ],
     "other": [
       "neovim",
       "fd-find",
