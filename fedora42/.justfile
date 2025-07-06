@@ -76,8 +76,8 @@ run-it version=_v_latest name=_name tag=_tag repo=_repo:
   just bc::_run-it {{ version }} {{ name }} {{ tag }} {{ repo }}
 
 [group("container")]
-run-it-local name=_name tag=_tag repo=_repo_local:
-  just bc::_run-it {{ name }} {{ tag }} {{ repo }}
+run-it-local version=_v_latest name=_name tag=_tag repo=_repo_local:
+  just bc::_run-it {{ version }} {{ name }} {{ tag }} {{ repo }}
 
 [private]
 [group("disk-image")]
@@ -127,7 +127,7 @@ gen-image version tag=_tag size="4G":
   just _gen-image {{ _repo }} {{ tag }} {{ version }} {{ size }}
 
 [group("disk-image")]
-gen-image-local version=_v_latest tag=_tag size="4G":
+gen-image-local version=_v_latest tag=_tag size="10G":
   just _gen-image {{ _repo_local }} {{ tag }} {{ version }} {{ size }}
 
 [group("vm")]

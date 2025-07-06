@@ -26,8 +26,8 @@ _run name tag repo:
 
 [private]
 [group("container")]
-_run-it name tag repo:
- podman run --rm -it --name {{ name }} "{{ repo }}/{{ tag }}" /bin/bash
+_run-it version name tag repo:
+ podman run --rm -it --name {{ name }} "{{ repo }}/{{ tag }}:{{ version }}" /usr/bin/fish
 
 [group("vm")]
 [no-cd]
