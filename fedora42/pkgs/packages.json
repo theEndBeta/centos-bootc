@@ -36,7 +36,8 @@
       "git",
       "firewalld",
       "tuned",
-      "just"
+      "just",
+      "snapper"
     ]
   },
   "remove": {
