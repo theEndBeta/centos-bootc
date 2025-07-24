@@ -44,7 +44,8 @@ RUN chmod 0644 ${userdb_dir}/vesu.user ${userdb_dir}/vesu.group \
 # systemd
 RUN systemctl enable cockpit.socket tailscaled.service bootc-fetch-apply-updates.timer \
   firewalld-set-zone.service firstboot-setup.service \
-  podman.service podman-clean-transient.service podman.socket podman-auto-update.timer
+  podman.service podman-clean-transient.service podman.socket podman-auto-update.timer \
+  snapper-cleanup.timer snapper-timeline.timer
 
 RUN rm /var/{log,cache,lib}/* -rf
 
