@@ -37,7 +37,8 @@
       "firewalld",
       "tuned",
       "just",
-      "snapper"
+      "snapper",
+      "systemd-container"
     ]
   },
   "remove": {
