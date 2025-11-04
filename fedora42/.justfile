@@ -1,10 +1,10 @@
 mod bc '../bootc.justfile'
 
-_name := "f42"
+_name := "f43"
 _repo := "quay.io/theendbeta"
 _repo_local := "localhost:5000"
 _tag := "fedora-bootc"
-_base_version := "42"
+_base_version := "43"
 _version := _base_version + "-" + `date +'%Y%m%d%H%M'`
 _v_latest := _base_version + "-latest"
 
@@ -19,6 +19,7 @@ pull-base:
 [group("container")]
 build version=_version repo=_repo tag=_tag:
   podman build . --pull=newer -f Containerfile \
+    --build-arg fedora_version={{ _base_version }} \
     -t "{{ repo }}/{{ tag }}:{{ version }}" \
     -t "{{ repo }}/{{ tag }}:{{ _v_latest }}"
 
@@ -26,6 +27,7 @@ build version=_version repo=_repo tag=_tag:
 [group("container")]
 build-local  version=_v_latest tag=_tag:
   podman build . --pull=newer -f Containerfile \
+    --build-arg fedora_version={{ _base_version }} \
     -t "{{ _repo_local }}/{{ tag }}:{{ version }}"
 
 # Push <tag> to local <repo>
@@ -145,3 +147,7 @@ vm-stop version=_v_latest name=_name:
 [group("vm")]
 vm-delete version=_v_latest name=_name:
   just bc::vm-delete {{ version }} {{ name }}
+
+[group("cloud")]
+quay-login:
+  podman login quay.io --username theendbeta+podman_desktop --password "$(bw get password 'quay.io [podman@etna]')"
